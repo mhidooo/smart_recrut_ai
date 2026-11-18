@@ -1,0 +1,11 @@
+package com.smartrecruit.ai.dto;
+
+import com.smartrecruit.ai.model.Role;
+
+public record UserResponse(
+        Long id,
+        String fullName,
+        String email,
+        Role role
+) {
+}
