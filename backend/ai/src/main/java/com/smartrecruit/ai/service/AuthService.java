@@ -1,5 +1,6 @@
 package com.smartrecruit.ai.service;
 
+import com.smartrecruit.ai.dto.LoginRequest;
 import com.smartrecruit.ai.dto.RegisterRequest;
 import com.smartrecruit.ai.dto.UserResponse;
 import com.smartrecruit.ai.model.Role;
@@ -28,6 +29,7 @@ public class AuthService {
         this.passwordEncoder = passwordEncoder;
     }
 
+    // Inscription d'un nouveau candidat
     public UserResponse register(RegisterRequest request) {
         String email = request.email()
                 .strip()
@@ -50,7 +52,9 @@ public class AuthService {
         User user = new User();
         user.setFullName(request.fullName().strip());
         user.setEmail(email);
-        user.setPasswordHash(passwordEncoder.encode(request.password()));
+        user.setPasswordHash(
+                passwordEncoder.encode(request.password())
+        );
         user.setRole(Role.CANDIDATE);
 
         User savedUser;
@@ -65,11 +69,49 @@ public class AuthService {
             );
         }
 
+        return toUserResponse(savedUser);
+    }
+
+    // Vérification des identifiants de connexion
+    public UserResponse login(LoginRequest request) {
+        String email = request.email()
+                .strip()
+                .toLowerCase(Locale.ROOT);
+
+        if (request.password().getBytes(StandardCharsets.UTF_8).length > 72) {
+            throw invalidCredentials();
+        }
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(this::invalidCredentials);
+
+        boolean passwordMatches = passwordEncoder.matches(
+                request.password(),
+                user.getPasswordHash()
+        );
+
+        if (!passwordMatches) {
+            throw invalidCredentials();
+        }
+
+        return toUserResponse(user);
+    }
+
+    // Conversion de l'entité en réponse sans mot de passe
+    private UserResponse toUserResponse(User user) {
         return new UserResponse(
-                savedUser.getId(),
-                savedUser.getFullName(),
-                savedUser.getEmail(),
-                savedUser.getRole()
+                user.getId(),
+                user.getFullName(),
+                user.getEmail(),
+                user.getRole()
+        );
+    }
+
+    // Même erreur pour un email inconnu ou un mauvais mot de passe
+    private ResponseStatusException invalidCredentials() {
+        return new ResponseStatusException(
+                HttpStatus.UNAUTHORIZED,
+                "Email ou mot de passe incorrect"
         );
     }
 }

@@ -1,5 +1,6 @@
 package com.smartrecruit.ai.controller;
 
+import com.smartrecruit.ai.dto.LoginRequest;
 import com.smartrecruit.ai.dto.RegisterRequest;
 import com.smartrecruit.ai.dto.UserResponse;
 import com.smartrecruit.ai.service.AuthService;
@@ -30,5 +31,14 @@ public class AuthController {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(response);
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<UserResponse> login(
+            @Valid @RequestBody LoginRequest request
+    ) {
+        UserResponse response = authService.login(request);
+
+        return ResponseEntity.ok(response);
     }
 }
