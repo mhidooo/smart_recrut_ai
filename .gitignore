@@ -1,0 +1,19 @@
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# Backend
+target/
+
+# Frontend
+node_modules/
+dist/
+
+# Configuration locale
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log

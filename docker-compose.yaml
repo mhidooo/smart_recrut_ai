@@ -1,0 +1,23 @@
+services:
+
+  db:
+    image: postgres:17
+    container_name: smartrecruit-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: smartrecruit_new
+      POSTGRES_USER: smartuser
+      POSTGRES_PASSWORD: smartpass
+    ports:
+      - "5433:5432"
+    volumes:
+      - smartrecruit_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U smartuser -d smartrecruit_new"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+volumes:
+  smartrecruit_db_data:

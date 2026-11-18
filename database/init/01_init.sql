@@ -1,0 +1,1 @@
+CREATE DATABASE smartrecruit_db;
